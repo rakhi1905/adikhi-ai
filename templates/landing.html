@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Adikhi AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:'Libre Baskerville', serif;
+
+    background:
+    linear-gradient(rgba(45,31,22,0.85), rgba(45,31,22,0.85)),
+    url("/static/coffee-bg.png");
+
+    background-size:cover;
+}
+
+/* MAIN BOX */
+.container {
+    text-align:center;
+    color:#f1e3c6;
+}
+
+/* LOGO IMAGE */
+.logo-img {
+    width:300px;
+    margin-bottom:20px;
+    opacity:0.95;
+    transition:0.3s;
+}
+
+/* TEXT */
+.logo-text {
+    font-size:38px;
+    letter-spacing:4px;
+    color: #f5e6c8;
+}
+
+.tagline {
+    margin-top:5px;
+    font-size:14px;
+    opacity:0.8;
+}
+
+/* INPUT */
+input {
+    display:block;
+    margin:12px auto;
+    padding:10px;
+    width:220px;
+    border-radius:6px;
+    border:none;
+    outline:none;
+}
+
+/* BUTTON */
+button {
+    margin-top:15px;
+    padding:10px 20px;
+    background:#5a3e2c;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover {
+    background:#7a5640;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- 🔥 YOUR LOGO -->
+    <img src="/static/adikhi-logo.png" class="logo-img">
+
+    <div class="logo-text">ADIKHI AI</div>
+    <div class="tagline">Business Intelligence Assistant</div>
+
+    <input id="username" placeholder="Username" autocomplete="off">
+    <input id="password" type="password" placeholder="Password" autocomplete="new-password">
+
+    <button onclick="login()">Login</button>
+    <button onclick="signup()">Signup</button>
+
+</div>
+
+<script>
+async function login(){
+    let usernameInput = document.getElementById("username");
+    let passwordInput = document.getElementById("password");
+
+    let username = usernameInput.value;
+    let password = passwordInput.value;
+
+    let res = await fetch("/login", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({username,password})
+    });
+
+    let data = await res.json();
+
+    if(data.message){
+        usernameInput.value = "";
+        passwordInput.value = "";
+        window.location.href = "/chat";
+    } else {
+        alert(data.error);
+    }
+}
+
+async function signup(){
+    let usernameInput = document.getElementById("username");
+    let passwordInput = document.getElementById("password");
+
+    let username = usernameInput.value;
+    let password = passwordInput.value;
+
+    let res = await fetch("/signup", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({username,password})
+    });
+
+    let data = await res.json();
+
+    alert(data.message || data.error);
+
+    usernameInput.value = "";
+    passwordInput.value = "";
+}
+</script>
+
+</body>
+</html>
