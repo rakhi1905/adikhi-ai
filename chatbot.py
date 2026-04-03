@@ -3,13 +3,14 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 
-load_dotenv()
+api_key = os.environ.get("GROQ_API_KEY")
 
-api_key = os.getenv("GROQ_API_KEY")
-print("API KEY:", api_key)
+if not api_key:
+    raise ValueError("❌ GROQ_API_KEY not found in environment")
+
+print("API KEY LOADED:", api_key[:10])  # safe print
 
 client = Groq(api_key=api_key)
-
 SYSTEM_PROMPT = """You are Adikhi AI, an elite business intelligence assistant.
 
 Give clear, practical, and structured business advice.
@@ -30,7 +31,7 @@ class AdikhiChatbot:
             ]
 
             completion = client.chat.completions.create(
-                model="llama3-8b-8192",
+                model="llama3-70b-8192",
                 messages=messages
             )
 
