@@ -106,8 +106,6 @@ if __name__ == "__main__":
     print("  🌐  Open: http://localhost:5000")
     print("★" * 55 + "\n")
 
-    import os
-
-if _name_ == "_main_":
+  
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
 
