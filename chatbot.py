@@ -1,16 +1,12 @@
-from groq import Groq
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from datetime import datetime
 
-api_key = os.environ.get("GROQ_API_KEY")
+load_dotenv()
 
-if not api_key:
-    raise ValueError("❌ GROQ_API_KEY not found in environment")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-print("API KEY LOADED:", api_key[:10])  # safe print
-
-client = Groq(api_key=api_key)
 SYSTEM_PROMPT = """You are Adikhi AI, an elite business intelligence assistant.
 
 Give clear, practical, and structured business advice.
@@ -19,31 +15,41 @@ Be professional and direct.
 """
 
 class AdikhiChatbot:
-    def __init__(self):
+    def _init_(self):   # ✅ FIXED
         self.history = []
         self.turn_count = 0
         self.session_start = datetime.now()
 
     def chat(self, user_message: str) -> str:
         try:
-            messages = [{"role": "system", "content": SYSTEM_PROMPT}] + self.history + [
-                {"role": "user", "content": user_message}
-            ]
-
-            completion = client.chat.completions.create(
-    model="mixtral-8x7b-32768",
-                messages=messages
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": user_message}
+                ]
             )
 
-            reply = completion.choices[0].message.content
+            reply = response.choices[0].message.content
 
         except Exception as e:
             print("ERROR:", e)
             reply = "⚠️ AI error"
 
-        self.history.append({"role": "user", "content": user_message})
         self.history.append({"role": "assistant", "content": reply})
         self.turn_count += 1
 
         return reply
-    
+
+    def reset(self):
+        self.history = []
+        self.turn_count = 0
+        self.session_start = datetime.now()
+
+    def stats(self):
+        mins = (datetime.now() - self.session_start).seconds // 60
+        return {
+            "turns": self.turn_count,
+            "messages": len(self.history),
+            "duration_mins": mins
+        }
