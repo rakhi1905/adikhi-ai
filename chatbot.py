@@ -15,7 +15,7 @@ Be professional and direct.
 """
 
 class AdikhiChatbot:
-    def _init_(self):   # ✅ FIXED
+    def __init__(self):
         self.history = []
         self.turn_count = 0
         self.session_start = datetime.now()
