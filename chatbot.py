@@ -5,7 +5,10 @@ from datetime import datetime
 
 load_dotenv()
 
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+api_key = os.getenv("GROQ_API_KEY")
+print("API KEY:", api_key)
+
+client = Groq(api_key=api_key)
 
 SYSTEM_PROMPT = """You are Adikhi AI, an elite business intelligence assistant.
 
@@ -15,19 +18,20 @@ Be professional and direct.
 """
 
 class AdikhiChatbot:
-    def _init_(self):   # ✅ FIXED
+    def _init_(self):
         self.history = []
         self.turn_count = 0
         self.session_start = datetime.now()
 
     def chat(self, user_message: str) -> str:
         try:
+            messages = [{"role": "system", "content": SYSTEM_PROMPT}] + self.history + [
+                {"role": "user", "content": user_message}
+            ]
+
             completion = client.chat.completions.create(
                 model="llama3-8b-8192",
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": user_message}
-                ]
+                messages=messages
             )
 
             reply = completion.choices[0].message.content
@@ -36,20 +40,8 @@ class AdikhiChatbot:
             print("ERROR:", e)
             reply = "⚠️ AI error"
 
+        self.history.append({"role": "user", "content": user_message})
         self.history.append({"role": "assistant", "content": reply})
         self.turn_count += 1
 
         return reply
-
-    def reset(self):
-        self.history = []
-        self.turn_count = 0
-        self.session_start = datetime.now()
-
-    def stats(self):
-        mins = (datetime.now() - self.session_start).seconds // 60
-        return {
-            "turns": self.turn_count,
-            "messages": len(self.history),
-            "duration_mins": mins
-        }
